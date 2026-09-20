@@ -1,0 +1,11 @@
+# Frontend (Node)
+frontend/node_modules/
+frontend/dist/
+
+# Backend (Python / uv)
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets
+.env
