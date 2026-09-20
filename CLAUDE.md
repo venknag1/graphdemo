@@ -10,11 +10,14 @@ See [Planning/PLAN.md](Planning/PLAN.md) for the original spec.
 - Neo4j, backend, and frontend all run in Docker via one `docker-compose.yml` (see Build order in [Planning/PLAN.md](Planning/PLAN.md)).
 
 ## Current state
-- **Phase 1 done:** Neo4j running via `docker-compose.yml` at the project root; Bolt (7687) and Browser (7474) verified reachable. Password lives in local `.env` (gitignored; see `.env.example`).
-- **Phase 2 done:** `backend/` is a `uv`-managed Python project. `backend/src/backend/seed.py` seeds 50 customers/accounts and `TRANSFER` relationships into Neo4j, including two circular fraud rings — verified via cypher-shell cycle-detection queries.
-- **Phase 3 (FastAPI `/fraud-rings` endpoint) not yet built.**
-- `frontend/` — still the default Vite + React 19 template (App.jsx untouched); Cytoscape.js integration not yet built.
-- Git repo initialized at the project root (`main` branch, local commits so far).
+All 6 build-order phases (see [Planning/PLAN.md](Planning/PLAN.md)) are complete:
+- **Phase 1:** Neo4j running via `docker-compose.yml`. Password lives in local `.env` (gitignored; see `.env.example`).
+- **Phase 2:** `backend/src/backend/seed.py` seeds 50 customers/accounts and `TRANSFER` relationships, including two circular fraud rings (normal transfers are constructed as a DAG so they can't accidentally form cycles).
+- **Phase 3:** FastAPI `GET /fraud-rings` (`backend/src/backend/main.py`, `fraud_rings.py`) detects cycles via Cypher and dedupes rotations.
+- **Phase 4:** `frontend/src/App.jsx` fetches `/fraud-rings` and renders it with `react-cytoscapejs`. Note: `main.jsx` deliberately does not use `React.StrictMode` — it breaks `react-cytoscapejs`'s instance lifecycle in dev.
+- **Phase 5:** Neo4j GDS plugin enabled (`docker-compose.yml`). PageRank and Louvain were both tried against the seeded graph and neither cleanly isolates the fraud rings (PageRank favors DAG sink accounts; Louvain hits modularity's resolution limit and fragments the rings) — the dedicated cycle-detection query is what actually powers `/fraud-rings`.
+- **Phase 6:** `backend/Dockerfile` and `frontend/Dockerfile` (multi-stage, served by nginx) added; full stack runs via `docker compose up -d --build`.
+- Git repo initialized at the project root (`main` branch).
 
 ## Frontend
 - Package manager: npm (package-lock.json present).
