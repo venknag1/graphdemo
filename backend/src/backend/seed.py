@@ -2,18 +2,9 @@
 transactions, including two circular fraud rings among the accounts.
 """
 
-import os
 import random
-from pathlib import Path
 
-from dotenv import load_dotenv
-from neo4j import GraphDatabase
-
-load_dotenv(Path(__file__).resolve().parents[3] / ".env")
-
-URI = "bolt://localhost:7687"
-USER = "neo4j"
-PASSWORD = os.environ["NEO4J_PASSWORD"]
+from backend.db import get_driver
 
 TOTAL_ACCOUNTS = 50
 FRAUD_RING_SIZES = [5, 4]
@@ -52,11 +43,15 @@ def create_fraud_ring(session, account_ids, ring_label):
 
 
 def create_normal_transactions(session, account_ids, ring_account_ids):
+    """Create random transfers that only flow to a later account in
+    account_ids, so this subgraph is a DAG and can never contain a cycle.
+    """
     normal_ids = [a for a in account_ids if a not in ring_account_ids]
     for src in normal_ids:
-        targets = random.sample(
-            [a for a in account_ids if a != src], random.randint(1, 3)
-        )
+        candidates = account_ids[account_ids.index(src) + 1 :]
+        if not candidates:
+            continue
+        targets = random.sample(candidates, min(random.randint(1, 3), len(candidates)))
         for dst in targets:
             session.run(
                 """
@@ -71,7 +66,7 @@ def create_normal_transactions(session, account_ids, ring_account_ids):
 
 def main():
     account_ids = [f"acct-{i}" for i in range(1, TOTAL_ACCOUNTS + 1)]
-    driver = GraphDatabase.driver(URI, auth=(USER, PASSWORD))
+    driver = get_driver()
 
     with driver.session() as session:
         clear_database(session)
