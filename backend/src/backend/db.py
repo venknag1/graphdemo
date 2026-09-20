@@ -8,7 +8,7 @@ from neo4j import GraphDatabase
 
 load_dotenv(Path(__file__).resolve().parents[3] / ".env")
 
-URI = "bolt://localhost:7687"
+URI = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
 USER = "neo4j"
 PASSWORD = os.environ["NEO4J_PASSWORD"]
 
