@@ -5,6 +5,7 @@ transactions, including two circular fraud rings among the accounts.
 import random
 
 from backend.db import get_driver
+from backend.embeddings import build_embeddings, create_vector_indexes, write_embeddings
 
 TOTAL_ACCOUNTS = 50
 FRAUD_RING_SIZES = [5, 4]
@@ -82,8 +83,13 @@ def main():
 
         create_normal_transactions(session, account_ids, ring_account_ids)
 
+        embeddings = build_embeddings(session)
+        write_embeddings(session, embeddings)
+        create_vector_indexes(session)
+
     driver.close()
-    print(f"Seeded {TOTAL_ACCOUNTS} accounts, {len(FRAUD_RING_SIZES)} fraud rings.")
+    print(f"Seeded {TOTAL_ACCOUNTS} accounts, {len(FRAUD_RING_SIZES)} fraud rings, "
+          f"{len(embeddings)} embeddings.")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import CytoscapeComponent from 'react-cytoscapejs'
+import SimilaritySearch from './SimilaritySearch'
 
 const API_URL = 'http://localhost:8000/fraud-rings'
 
@@ -80,6 +81,7 @@ function App() {
           style={{ width: '100%', height: '600px', textAlign: 'left' }}
         />
       )}
+      <SimilaritySearch />
     </div>
   )
 }
