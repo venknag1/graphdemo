@@ -17,7 +17,11 @@ Also a personal project to learn Neo4j and Cypher along the way — see
   chains via a graph cycle-detection query.
 - **React frontend** (`frontend/`) — fetches `/fraud-rings` and renders it
   with Cytoscape.js.
-- All three run as Docker containers via one `docker-compose.yml`.
+- **Vector similarity search** — each account also gets a real behavior
+  embedding (in/out-degree, amounts sent/received, computed from its actual
+  transfers), searchable via Neo4j's native vector index using either
+  cosine or Euclidean similarity (`GET /similar-accounts/{id}?metric=...`).
+- All three services run as Docker containers via one `docker-compose.yml`.
 
 ## Running it
 

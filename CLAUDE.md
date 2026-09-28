@@ -17,7 +17,8 @@ All 6 build-order phases (see [Planning/PLAN.md](Planning/PLAN.md)) are complete
 - **Phase 4:** `frontend/src/App.jsx` fetches `/fraud-rings` and renders it with `react-cytoscapejs`. Note: `main.jsx` deliberately does not use `React.StrictMode` — it breaks `react-cytoscapejs`'s instance lifecycle in dev.
 - **Phase 5:** Neo4j GDS plugin enabled (`docker-compose.yml`). PageRank and Louvain were both tried against the seeded graph and neither cleanly isolates the fraud rings (PageRank favors DAG sink accounts; Louvain hits modularity's resolution limit and fragments the rings) — the dedicated cycle-detection query is what actually powers `/fraud-rings`.
 - **Phase 6:** `backend/Dockerfile` and `frontend/Dockerfile` (multi-stage, served by nginx) added; full stack runs via `docker compose up -d --build`.
-- Git repo initialized at the project root (`main` branch).
+- **Post-plan addition:** vector embedding similarity search (`backend/src/backend/embeddings.py`, `similarity.py`; `GET /similar-accounts/{id}?metric=cosine|euclidean`; frontend `SimilaritySearch.jsx`). Embeddings are 6 real per-account stats (in/out-degree, amounts sent/received) computed from the actual `TRANSFER` data, standardized, then indexed via Neo4j's native vector index. Note: Neo4j allows only one vector index per (label, property) pair, so the same embedding is stored under two property names (`embedding_cosine`, `embedding_euclidean`) - one index per metric.
+- Git repo initialized at the project root (`main` branch), pushed to `github.com/venknag1/graphdemo` (public).
 
 ## Frontend
 - Package manager: npm (package-lock.json present).
