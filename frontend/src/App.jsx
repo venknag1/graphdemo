@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import CytoscapeComponent from 'react-cytoscapejs'
 import SimilaritySearch from './SimilaritySearch'
+import PageRank from './PageRank'
 
 const API_URL = 'http://localhost:8000/fraud-rings'
 
@@ -82,6 +83,7 @@ function App() {
         />
       )}
       <SimilaritySearch />
+      <PageRank />
     </div>
   )
 }

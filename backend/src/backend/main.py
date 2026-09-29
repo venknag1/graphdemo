@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.db import get_driver
 from backend.fraud_rings import find_fraud_rings
+from backend.pagerank import run_pagerank
 from backend.similarity import find_similar_accounts
 
 app = FastAPI()
@@ -37,3 +38,9 @@ def get_similar_accounts(account_id: str, metric: Literal["cosine", "euclidean"]
     with driver.session() as session:
         similar = find_similar_accounts(session, account_id, metric)
         return {"account": account_id, "metric": metric, "similar": similar}
+
+
+@app.get("/pagerank")
+def get_pagerank():
+    with driver.session() as session:
+        return {"ranking": run_pagerank(session)}
